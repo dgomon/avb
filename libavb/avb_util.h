@@ -54,6 +54,14 @@ extern "C" {
 #define AVB__REPEAT(n, x) AVB_CONCAT(AVB__REPEAT, n)(x)
 #define AVB_REPEAT(n, x) AVB__REPEAT(n, x)
 
+#ifndef AVB_ENABLE_DEBUG
+#define AVB_ENABLE_DEBUG
+#endif
+
+#ifndef AVB_USE_PRINTF_LOGS
+#define AVB_USE_PRINTF_LOGS
+#endif
+
 #ifdef AVB_USE_PRINTF_LOGS
 #define AVB_LOG(level, message, ...)                                        \
   avb_printf("%s:%d: " level                                                \
