@@ -195,7 +195,7 @@ ALGORITHMS = {
 def get_release_string():
   """Calculates the release string to use in the VBMeta struct."""
   # Keep in sync with libavb/avb_version.c:avb_version_string().
-  return 'avbtool {}.{}.{}'.format(AVB_VERSION_MAJOR,
+  return 'avbtool XXX {}.{}.{}'.format(AVB_VERSION_MAJOR,
                                    AVB_VERSION_MINOR,
                                    AVB_VERSION_SUB)
 
