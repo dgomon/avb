@@ -3070,30 +3070,34 @@ class Avb(object):
       all_chain_partitions.extend(chain_partitions_do_not_use_ab)
 
     if len(all_chain_partitions) > 0:
+      print(f"Processing {len(all_chain_partitions)} chained partitions...")
       used_locations = {rollback_index_location: True}
       for cp in all_chain_partitions:
+        print(f"Processing chained partition: {cp}")
         cp_tokens = cp.split(':')
         if len(cp_tokens) != 3:
           raise AvbError('Malformed chained partition "{}".'.format(cp))
         partition_name = cp_tokens[0]
         chained_rollback_index_location = int(cp_tokens[1])
         file_path = cp_tokens[2]
-        # Check that the same rollback location isn't being used by
-        # multiple chained partitions.
+        print(f"Partition: {partition_name}, Rollback Index Location: {chained_rollback_index_location}, File: {file_path}")
+        # Check that the same rollback location isn't being used by multiple chained partitions.
         if used_locations.get(chained_rollback_index_location):
-          raise AvbError('Rollback Index Location {} is already in use.'.format(
-              chained_rollback_index_location))
+          raise AvbError(f'Rollback Index Location {chained_rollback_index_location} is already in use.')
         used_locations[chained_rollback_index_location] = True
         desc = AvbChainPartitionDescriptor()
         desc.partition_name = partition_name
         desc.rollback_index_location = chained_rollback_index_location
         if desc.rollback_index_location < 1:
           raise AvbError('Rollback index location must be 1 or larger.')
+        print(f"Reading public key from {file_path}...")
         with open(file_path, 'rb') as f:
           desc.public_key = f.read()
         if chain_partitions_do_not_use_ab and (cp in chain_partitions_do_not_use_ab):
+          print(f"Setting flags for partition {partition_name} (do not use A/B)")
           desc.flags |= 1
         descriptors.append(desc)
+        print(f"Added descriptor for partition {partition_name}.")
 
     # Descriptors.
     encoded_descriptors = bytearray()
