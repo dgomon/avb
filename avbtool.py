@@ -2954,6 +2954,7 @@ class Avb(object):
       AvbError: If a chained partition is malformed.
     """
     # If we're asked to calculate minimum required libavb version, we're done.
+    print('AVBT make_vbmeta_image: enter')
     tmp_header = AvbVBMetaHeader()
     if rollback_index_location > 0:
       tmp_header.bump_required_libavb_version_minor(2)
@@ -3050,6 +3051,7 @@ class Avb(object):
         been given and the given algorithm requires one, or the key is
         of the wrong size.
     """
+    print('AVBT _generate_vbmeta_blob: enter')
     try:
       alg = ALGORITHMS[algorithm_name]
     except KeyError as e:
@@ -3152,14 +3154,15 @@ class Avb(object):
 
     # Add descriptors from other images.
     if include_descriptors_from_image:
+      print(f"Processing {len(include_descriptors_from_image)} images for descriptors...")
       descriptors_dict = dict()
       for image in include_descriptors_from_image:
+        print(f"Opening image: {image.name}")
         image_handler = ImageHandler(image.name, read_only=True)
-        (_, image_vbmeta_header, image_descriptors, _) = self._parse_image(
-            image_handler)
-        # Bump the required libavb version to support all included descriptors.
-        h.bump_required_libavb_version_minor(
-            image_vbmeta_header.required_libavb_version_minor)
+        (_, image_vbmeta_header, image_descriptors, _) = self._parse_image(image_handler)
+        print(f"Parsed {len(image_descriptors)} descriptors from {image.name}")
+        print(f"Bumping required libavb version to: {image_vbmeta_header.required_libavb_version_minor}")
+        h.bump_required_libavb_version_minor(image_vbmeta_header.required_libavb_version_minor)
         for desc in image_descriptors:
           # The --include_descriptors_from_image option is used in some setups
           # with images A and B where both A and B contain a descriptor
@@ -3168,10 +3171,14 @@ class Avb(object):
           # See bug 76386656 for details.
           if hasattr(desc, 'partition_name'):
             key = type(desc).__name__ + '_' + desc.partition_name
+            print(f"Storing descriptor for partition: {desc.partition_name} with key: {key}")
             descriptors_dict[key] = desc.encode()
           else:
+            print(f"Adding non-partition descriptor: {type(desc).__name__}")
             encoded_descriptors.extend(desc.encode())
+      print("Finalizing descriptor inclusion...")
       for key in sorted(descriptors_dict):
+        print(f"Including descriptor: {key}")
         encoded_descriptors.extend(descriptors_dict[key])
 
     # Load public key metadata blob, if requested.
@@ -4800,7 +4807,7 @@ class AvbTool(object):
   def make_vbmeta_image(self, args):
     """Implements the 'make_vbmeta_image' sub-command."""
     args = self._fixup_common_args(args)
-    print('XXX make_vbmeta_image enter XXX')
+    print('AVBT make_vbmeta_image: enter')
     self.avb.make_vbmeta_image(args.output, args.chain_partition,
                                args.chain_partition_do_not_use_ab,
                                args.algorithm, args.key,
@@ -4816,6 +4823,7 @@ class AvbTool(object):
                                args.append_to_release_string,
                                args.print_required_libavb_version,
                                args.padding_size)
+    print('AVBT make_vbmeta_image: exit')
 
   def append_vbmeta_image(self, args):
     """Implements the 'append_vbmeta_image' sub-command."""
