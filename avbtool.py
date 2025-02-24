@@ -4800,6 +4800,7 @@ class AvbTool(object):
   def make_vbmeta_image(self, args):
     """Implements the 'make_vbmeta_image' sub-command."""
     args = self._fixup_common_args(args)
+    print('XXX make_vbmeta_image enter XXX')
     self.avb.make_vbmeta_image(args.output, args.chain_partition,
                                args.chain_partition_do_not_use_ab,
                                args.algorithm, args.key,
