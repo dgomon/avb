@@ -3417,6 +3417,11 @@ class Avb(object):
     Raises:
       AvbError: If an argument is incorrect of if adding of hash_footer failed.
     """
+    print("Function: add_hash_footer called with parameters:")
+    for param, value in locals().items():
+      if param != "self":
+        print(f"  {param}: {value}")
+
     if not partition_size and not dynamic_partition_size:
       raise AvbError('--dynamic_partition_size required when not specifying a '
                      'partition size')
